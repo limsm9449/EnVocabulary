@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">최고의 영어 단어장</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_sentence_view">문장보기</string>
+    <string name="action_tts">TTS</string>
+    <string name="action_edit">수정모드</string>
+    <string name="action_exit">취소</string>
+    <string name="action_refresh">동기화</string>
+    <string name="action_web_dictionary">웹사전</string>
+    <string name="action_settings">환경 설정</string>
+    <string name="action_share">어플 공유</string>
+    <string name="action_no_ad">광고 제거 어플(유료)</string>
+    <string name="action_blank">Blank</string>
+
+    <!-- My -->
+    <string name="banner_ad_unit_id">ca-app-pub-3860766380986792/3093295467</string>
+
+    <string name="title_activity_dictionary">영한사전</string>
+    <string name="title_activity_web_dictionary">웹 사전</string>
+    <string name="title_activity_blank">Blank</string>
+    <string name="title_activity_daum_vocabulary">Daum 단어장</string>
+    <string name="title_activity_daum_vocabulary_view">Daum 단어장 상세</string>
+    <string name="title_activity_word_view">단어 상세</string>
+    <string name="title_activity_sentence_view">문장 상세</string>
+    <string name="title_activity_settings">환경 설정</string>
+    <string name="title_activity_study">단어학습</string>
+    <string name="title_activity_study1">Study1Activity</string>
+    <string name="title_activity_study2">Study2Activity</string>
+    <string name="title_activity_study3">Study3Activity</string>
+    <string name="title_activity_study4">Study4Activity</string>
+    <string name="title_activity_study5">Study5Activity</string>
+    <string name="title_activity_study6">Study6Activity</string>
+    <string name="title_activity_vocabulary_edit">단어 편집</string>
+
+</resources>

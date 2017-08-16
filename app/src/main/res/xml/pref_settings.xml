@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <ListPreference
+        android:defaultValue="17"
+        android:key="key_fontSize"
+        android:title="폰트 사이즈"
+        android:entries="@array/fontSizeName"
+        android:entryValues="@array/fontSize"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"/>
+
+    <ListPreference
+        android:defaultValue="0"
+        android:key="key_wordView"
+        android:title="단어 상세 - Naver, Daum, 예제"
+        android:entries="@array/wordView"
+        android:entryValues="@array/wordViewIdx"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"/>
+
+    <PreferenceCategory android:title="백업 / 복구">
+        <Preference
+            android:key="key_backup"
+            android:title="백업"
+            android:summary="단어장 데이타를 envocabulary 디렉토리에 백업합니다."/>
+        <Preference
+            android:key="key_recovery"
+            android:title="복구"
+            android:summary="envocabulary 디렉토리에서 단어장 데이타를 복구합니다."/>
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="초기화">
+        <Preference
+            android:key="key_voc_clear"
+            android:title="단어장 초기화"
+            android:summary="모든 단어장을 삭제합니다."/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

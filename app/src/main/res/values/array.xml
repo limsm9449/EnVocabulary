@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="studyKind">
+        <item>단답 학습</item>
+        <item>4지선다 학습</item>
+        <item>카드형 학습</item>
+        <item>카드형 OX 학습</item>
+        <item>카드형 4지선다 학습</item>
+        <item>카드형 4지선다 TTS 학습</item>
+    </string-array>
+
+    <string-array name="fontSize">
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+    </string-array>
+    <string-array name="fontSizeName">
+        <item>13</item>
+        <item>14</item>
+        <item>15</item>
+        <item>16</item>
+        <item>17</item>
+        <item>18</item>
+        <item>19</item>
+        <item>20</item>
+        <item>21</item>
+        <item>22</item>
+        <item>23</item>
+        <item>24</item>
+        <item>25</item>
+    </string-array>
+
+    <string-array name="daumOrderValue">
+        <item>즐겨찾기</item>
+        <item>즐겨찾기 D</item>
+        <item>최근수정</item>
+        <item>최근수정 D</item>
+        <item>제목</item>
+        <item>제목 D</item>
+    </string-array>
+
+    <string-array name="dicOrderValue">
+        <item>등록일 D</item>
+        <item>단어 D</item>
+        <item>뜻 D</item>
+        <item>등록일</item>
+        <item>단어</item>
+        <item>뜻</item>
+        <item>Random</item>
+    </string-array>
+
+    <string-array name="webDic">
+        <item>Naver</item>
+        <item>Daum</item>
+    </string-array>
+
+    <string-array name="wordView">
+        <item>Naver</item>
+        <item>Daum</item>
+        <item>예제</item>
+    </string-array>
+    <string-array name="wordViewIdx">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+</resources>
