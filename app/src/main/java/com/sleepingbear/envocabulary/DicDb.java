@@ -862,20 +862,129 @@ public class DicDb {
         return rtn;
     }
 
-    public static void insMyVocabularyFromDaumCategory(SQLiteDatabase db, String kind, String categoryId) {
+    public static void insMyVocabularyFromDaumCategory(SQLiteDatabase db, String daumKind, String kind, String categoryId) {
+        StringBuffer sql = new StringBuffer();
+
+        if ( "R1,R2,R3".indexOf(daumKind) < 0 ) {
+            sql.append("DELETE FROM DIC_MY_VOC " + CommConstants.sqlCR);
+            sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+            sql.append("   AND WORD IN (SELECT WORD FROM DAUM_CATEGORY_VOC WHERE CATEGORY_ID = '" + categoryId + "')" + CommConstants.sqlCR);
+            DicUtils.dicSqlLog(sql.toString());
+            db.execSQL(sql.toString());
+
+            sql.setLength(0);
+            sql.append("INSERT INTO DIC_MY_VOC (KIND, WORD, MEAN, SPELLING, SAMPLES, MEMO, MEMORIZATION, INS_DATE) " + CommConstants.sqlCR);
+            sql.append("SELECT '" + kind + "', WORD, MEAN, SPELLING, SAMPLES, MEMO, 'N', '" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".")  + "' " + CommConstants.sqlCR);
+            sql.append("  FROM DAUM_CATEGORY_VOC " + CommConstants.sqlCR);
+            sql.append(" WHERE CATEGORY_ID = '" + categoryId + "'" + CommConstants.sqlCR);
+            DicUtils.dicSqlLog(sql.toString());
+            db.execSQL(sql.toString());
+        } else {
+            sql.append("DELETE FROM DIC_MY_VOC " + CommConstants.sqlCR);
+            sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+            sql.append("   AND WORD IN (SELECT WORD FROM DAUM_VOCABULARY WHERE CATEGORY_ID = '" + categoryId + "')" + CommConstants.sqlCR);
+            DicUtils.dicSqlLog(sql.toString());
+            db.execSQL(sql.toString());
+
+            sql.setLength(0);
+            sql.append("INSERT INTO DIC_MY_VOC (KIND, WORD, MEAN, SPELLING, SAMPLES, MEMO, MEMORIZATION, INS_DATE) " + CommConstants.sqlCR);
+            sql.append("SELECT '" + kind + "', WORD, MEAN, SPELLING, '' SAMPLES, '' MEMO, 'N', '" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".")  + "' " + CommConstants.sqlCR);
+            sql.append("  FROM DIC " + CommConstants.sqlCR);
+            sql.append(" WHERE ENTRY_ID IN (SELECT ENTRY_ID FROM DAUM_VOCABULARY WHERE CATEGORY_ID = '" + categoryId + "')" + CommConstants.sqlCR);
+            DicUtils.dicSqlLog(sql.toString());
+            db.execSQL(sql.toString());
+
+            //예제 업데이트
+            updSamplesAllFromDicMyVoc(db, kind);
+        }
+    }
+
+    public static void insMyVocabulary(SQLiteDatabase db, String kind, String word, String mean, String spelling, String samples, String memo) {
         StringBuffer sql = new StringBuffer();
         sql.append("DELETE FROM DIC_MY_VOC " + CommConstants.sqlCR);
         sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
-        sql.append("   AND WORD IN (SELECT WORD FROM DAUM_CATEGORY_VOC WHERE CATEGORY_ID = '" + categoryId + "')" + CommConstants.sqlCR);
-        DicUtils.dicSqlLog(sql.toString());
+        sql.append("   AND WORD = '" + word + "'" + CommConstants.sqlCR);
+        //DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
 
         sql.setLength(0);
         sql.append("INSERT INTO DIC_MY_VOC (KIND, WORD, MEAN, SPELLING, SAMPLES, MEMO, MEMORIZATION, INS_DATE) " + CommConstants.sqlCR);
-        sql.append("SELECT '" + kind + "', WORD, MEAN, SPELLING, SAMPLES, MEMO, 'N', '" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".")  + "' " + CommConstants.sqlCR);
-        sql.append("  FROM DAUM_CATEGORY_VOC " + CommConstants.sqlCR);
-        sql.append(" WHERE CATEGORY_ID = '" + categoryId + "'" + CommConstants.sqlCR);
+        sql.append("VALUES ('" + kind + "', '" + word.replaceAll("'","''") + "','" + mean.replaceAll("'","''") + "','" + spelling.replaceAll("'","''") + "','" + samples.replaceAll("'","''") + "','" + memo.replaceAll("'","''") + "','N','" + DicUtils.getDelimiterDate(DicUtils.getCurrentDate(), ".")  + "') " + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
+    }
+
+    public static void updMyVocabulary(SQLiteDatabase db, String seq, String kind, String word, String mean, String spelling, String samples, String memo) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("UPDATE DIC_MY_VOC " + CommConstants.sqlCR);
+        sql.append("SET    WORD = '" + word.replaceAll("'","''") + "'," + CommConstants.sqlCR);
+        sql.append("       MEAN = '" + mean.replaceAll("'","''") + "'," + CommConstants.sqlCR);
+        sql.append("       SPELLING = '" + spelling.replaceAll("'","''") + "'," + CommConstants.sqlCR);
+        sql.append("       SAMPLES = '" + samples.replaceAll("'","''") + "'," + CommConstants.sqlCR);
+        sql.append("       MEMO = '" + memo.replaceAll("'","''") + "'" + CommConstants.sqlCR);
+        sql.append("WHERE  seq = '" + seq + "'" + CommConstants.sqlCR);
+        //DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
+    public static HashMap getWordInfo(SQLiteDatabase db, String word) {
+        HashMap rtn = new HashMap();
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT WORD, SPELLING, MEAN" + CommConstants.sqlCR);
+        sql.append("  FROM DIC " + CommConstants.sqlCR);
+        sql.append(" WHERE WORD = '" + word.toLowerCase().replaceAll("'", " ") + "'" + CommConstants.sqlCR);
+        sql.append("ORDER  BY SPELLING DESC " + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+
+        Cursor cursor = db.rawQuery(sql.toString(), null);
+        if ( cursor.moveToNext() ) {
+            rtn.put("WORD", cursor.getString(cursor.getColumnIndexOrThrow("WORD")));
+            rtn.put("SPELLING", cursor.getString(cursor.getColumnIndexOrThrow("SPELLING")));
+            rtn.put("MEAN", cursor.getString(cursor.getColumnIndexOrThrow("MEAN")));
+        } else {
+            rtn = getMeanOther(db, word);
+        }
+        cursor.close();
+
+        return rtn;
+    }
+
+    public static String getWordSamples(SQLiteDatabase db, String word) {
+        HashMap rtn = new HashMap();
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT SENTENCE1, SENTENCE2" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_SAMPLE " + CommConstants.sqlCR);
+        sql.append(" WHERE SENTENCE1 LIKE '% " + word.toLowerCase().replaceAll("'", " ") + " %'" + CommConstants.sqlCR);
+        sql.append("LIMIT 2" + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+
+        String samples = "";
+        Cursor cursor = db.rawQuery(sql.toString(), null);
+        while ( cursor.moveToNext() ) {
+            samples += (samples.equals("") ? "" : "\n") + cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE1")) + ":" + cursor.getString(cursor.getColumnIndexOrThrow("SENTENCE2"));
+        }
+        cursor.close();
+
+        return samples;
+    }
+
+    public static void updSamplesAllFromDicMyVoc(SQLiteDatabase db, String kind) {
+        HashMap rtn = new HashMap();
+        StringBuffer sql = new StringBuffer();
+        sql.append("SELECT SEQ, WORD" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_MY_VOC " + CommConstants.sqlCR);
+        sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+        sql.append("   AND SAMPLES = ''" + CommConstants.sqlCR);
+        //DicUtils.dicSqlLog(sql.toString());
+
+        Cursor cursor = db.rawQuery(sql.toString(), null);
+        while ( cursor.moveToNext() ) {
+            sql.setLength(0);
+            sql.append("UPDATE DIC_MY_VOC" + CommConstants.sqlCR);
+            sql.append("   SET SAMPLES = '" + getWordSamples(db, cursor.getString(cursor.getColumnIndexOrThrow("WORD"))).replaceAll("'","''") + "'" + CommConstants.sqlCR);
+            sql.append(" WHERE SEQ = '" + cursor.getString(cursor.getColumnIndexOrThrow("SEQ")) + "'" + CommConstants.sqlCR);
+            db.execSQL(sql.toString());
+        }
+        cursor.close();
     }
 }

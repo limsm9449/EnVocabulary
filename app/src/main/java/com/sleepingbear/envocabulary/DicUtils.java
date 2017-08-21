@@ -9,13 +9,18 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.Toast;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Row;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,6 +33,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -952,5 +958,168 @@ public class DicUtils {
             rtn[i] = (String)al.get(i);
         }
         return rtn;
+    }
+
+    public static String getFileName(String saveFileName, String extension) {
+        String fileName = "";
+
+        File appDir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName);
+        if (!appDir.exists()) {
+            appDir.mkdirs();
+        }
+
+        if (saveFileName.indexOf(".") > -1) {
+            fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName;
+        } else {
+            fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName + "." + extension;
+        }
+
+        return fileName;
+    }
+
+    public static boolean writeExcelVocabulary(String fileName, Cursor cursor) {
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+            Log.w(CommConstants.tag, "Storage not available or read only");
+            return false;
+        }
+
+        boolean success = false;
+
+        // 워크북 생성
+        HSSFWorkbook workbook = new HSSFWorkbook();
+        // 워크시트 생성
+        HSSFSheet sheet = workbook.createSheet("aaa");
+
+        int rowIdx = 0;
+        int cellIdx = 0;
+
+        // Generate column headings
+        HSSFRow row = sheet.createRow(rowIdx++);
+
+        HSSFCell c = null;
+        c = row.createCell(0);
+        c.setCellValue("단어");
+        sheet.setColumnWidth(0, (10 * 500));
+
+        c = row.createCell(1);
+        c.setCellValue("뜻");
+        sheet.setColumnWidth(1, (15 * 500));
+
+        c = row.createCell(2);
+        c.setCellValue("스펠링");
+        sheet.setColumnWidth(2, (15 * 500));
+
+        c = row.createCell(3);
+        c.setCellValue("예제");
+        sheet.setColumnWidth(3, (30 * 500));
+
+        c = row.createCell(4);
+        c.setCellValue("메모");
+        sheet.setColumnWidth(4, (30 * 500));
+
+        // Create a path where we will place our List of objects on external storage
+        File file = new File(fileName);
+        FileOutputStream os = null;
+
+        try {
+            while (cursor.moveToNext()) {
+                row = sheet.createRow(rowIdx++);
+
+                cellIdx = 0;
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("WORD")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("MEAN")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("SPELLING")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("SAMPLES")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("MEMO")));
+            }
+
+            os = new FileOutputStream(file);
+            workbook.write(os);
+            Log.w("FileUtils", "Writing file" + file);
+            success = true;
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+            } catch (Exception ex) {
+            }
+        }
+
+        return success;
+    }
+
+    public static boolean readExcelVocabulary(SQLiteDatabase db, File file, String kind, boolean isOnlyWord) {
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+            return false;
+        }
+
+        try{
+            FileInputStream myInput = new FileInputStream(file);
+
+            POIFSFileSystem myFileSystem = new POIFSFileSystem(myInput);
+            HSSFWorkbook workbook = new HSSFWorkbook(myFileSystem);
+            HSSFSheet mySheet = workbook.getSheetAt(0);
+
+            Iterator<Row> rowIter = mySheet.rowIterator();
+            while ( rowIter.hasNext() ) {
+                HSSFRow myRow = (HSSFRow) rowIter.next();
+
+                if ( isOnlyWord ) {
+                    String word = getString(myRow.getCell(0).toString());
+                    if (!"단어".equals(word) && !"".equals(word)) {
+                        HashMap wordInfo = DicDb.getWordInfo(db, word);
+                        if ( wordInfo.containsKey("WORD") ) {
+                            String mean = (String)wordInfo.get("MEAN");
+                            String spelling = DicUtils.getString((String)wordInfo.get("SPELLING")).replace("[","").replace("]","");
+                            String samples = DicDb.getWordSamples(db, word);
+
+                            DicDb.insMyVocabulary(db, kind, word, mean, spelling, samples, "");
+                        }
+                    }
+                } else {
+                    int idx = 0;
+                    String word = getString(myRow.getCell(idx++).toString());
+                    String mean = getString(myRow.getCell(idx++).toString());
+                    String spelling = getString(myRow.getCell(idx++).toString());
+                    String samples = getString(myRow.getCell(idx++).toString());
+                    String memo = getString(myRow.getCell(idx++).toString());
+
+                    if (!"단어".equals(word)) {
+                        if (!"".equals(word) && !"".equals(mean)) {
+                            DicDb.insMyVocabulary(db, kind, word, mean, spelling, samples, memo);
+                        }
+                    }
+                }
+            }
+        } catch ( Exception e ) {
+            e.printStackTrace();
+        }
+
+        return true;
+    }
+
+    public static void putCell(HSSFRow row, int cellIdx, String data) {
+        HSSFCell c = row.createCell(cellIdx);
+        c.setCellValue(data);
+    }
+
+    public static boolean isExternalStorageReadOnly() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(extStorageState)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isExternalStorageAvailable() {
+        String extStorageState = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(extStorageState)) {
+            return true;
+        }
+        return false;
     }
 }

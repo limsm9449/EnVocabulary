@@ -71,7 +71,7 @@ public class DaumVocabularyViewActivity extends AppCompatActivity {
     }
 
     public void getListView() {
-        Cursor cursor = db.rawQuery(DicQuery.getDaumCategoryVocabulary(categoryId), null);
+        Cursor cursor = db.rawQuery(DicQuery.getDaumCategoryVocabulary(kind, categoryId), null);
         if ( cursor.getCount() == 0 && "R1,R2,R3".indexOf(DicUtils.getString(kind)) < 0 && isOne ) {
             isOne = false;
             if ( DicUtils.isNetWork(this) ) {

@@ -43,6 +43,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 public class VocabularyViewActivity extends AppCompatActivity implements View.OnClickListener {
     private DbHelper dbHelper;
@@ -71,12 +72,15 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
             @Override
             public void onClick(View view) {
                 //메뉴 선택 다이얼로그 생성
-                final String[] kindCodeNames = new String[3];
+                final String[] kindCodeNames = new String[6];
 
                 int idx = 0;
                 kindCodeNames[idx++] = "직접 추가";
+                kindCodeNames[idx++] = "엑셀파일에서 추가";
                 kindCodeNames[idx++] = "영한사전에서 추가";
                 kindCodeNames[idx++] = "Daum 단어장에서 추가";
+                kindCodeNames[idx++] = "단어목록으로 추가(엑셀)";
+                kindCodeNames[idx++] = "단어목록으로 추가(직접입력)";
 
                 final android.support.v7.app.AlertDialog.Builder dlg = new android.support.v7.app.AlertDialog.Builder(VocabularyViewActivity.this);
                 dlg.setTitle("선택");
@@ -99,6 +103,34 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                             intent.putExtras(bundle);
                             startActivityForResult(intent, CommConstants.a_vocabularyEdit);
                         } else if ( mSelect == 1 ) {
+                            new AlertDialog.Builder(VocabularyViewActivity.this)
+                                    .setTitle("알림")
+                                    .setMessage("엑셀 데이터 포맷이 맞습니까?\nCell : A(단어), B(뜻), C(스펠링), D(예제), E(메모)")
+                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            FileChooser filechooser = new FileChooser(VocabularyViewActivity.this);
+                                            filechooser.setFileListener(new FileChooser.FileSelectedListener() {
+                                                @Override
+                                                public void fileSelected(final File file) {
+                                                    boolean isSave = DicUtils.readExcelVocabulary(db, file, kind, false);
+                                                    if ( isSave ) {
+                                                        Toast.makeText(getApplicationContext(), "엑셀에서 단어정보를 정상적으로 등록하였습니다.", Toast.LENGTH_LONG).show();
+                                                        getListView();
+                                                    }
+                                                }
+                                            });
+                                            filechooser.setExtension("xlsx");
+                                            filechooser.showDialog();
+                                        }
+                                    })
+                                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .show();
+                        } else if ( mSelect == 2 ) {
                             Bundle bundle = new Bundle();
                             bundle.putString("KIND", CommConstants.dictionaryKind_f);
                             bundle.putString("CATEGORY_KIND", kind);
@@ -106,13 +138,86 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                             Intent intent = new Intent(getApplication(), DictionaryActivity.class);
                             intent.putExtras(bundle);
                             startActivityForResult(intent, CommConstants.a_dictionary);
-                        } else if ( mSelect == 2 ) {
+                        } else if ( mSelect == 3 ) {
                             Bundle bundle = new Bundle();
                             bundle.putString("CATEGORY_KIND", kind);
 
                             Intent intent = new Intent(getApplication(), DaumVocabularyActivity.class);
                             intent.putExtras(bundle);
                             startActivityForResult(intent, CommConstants.a_daum);
+                        } else if ( mSelect == 4 ) {
+                            new AlertDialog.Builder(VocabularyViewActivity.this)
+                                    .setTitle("알림")
+                                    .setMessage("엑셀 데이터 포맷이 맞습니까?\nCell : A(단어)")
+                                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            FileChooser filechooser = new FileChooser(VocabularyViewActivity.this);
+                                            filechooser.setFileListener(new FileChooser.FileSelectedListener() {
+                                                @Override
+                                                public void fileSelected(final File file) {
+                                                    boolean isSave = DicUtils.readExcelVocabulary(db, file, kind, true);
+                                                    if ( isSave ) {
+                                                        Toast.makeText(getApplicationContext(), "엑셀에서 단어 목록을 정상적으로 등록하였습니다.", Toast.LENGTH_LONG).show();
+                                                        getListView();
+                                                    }
+                                                }
+                                            });
+                                            filechooser.setExtension("xls");
+                                            filechooser.showDialog();
+                                        }
+                                    })
+                                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .show();
+                        } else if ( mSelect == 5 ) {
+                            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+                            final View dialog_layout = inflater.inflate(R.layout.dialog_vocabulary_list_i, null);
+
+                            //dialog 생성..
+                            AlertDialog.Builder builder = new AlertDialog.Builder(VocabularyViewActivity.this);
+                            builder.setView(dialog_layout);
+                            final AlertDialog alertDialog = builder.create();
+                            final EditText et_input = ((EditText) dialog_layout.findViewById(R.id.my_et_input));
+                            ((Button) dialog_layout.findViewById(R.id.my_b_save)).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    if ( "".equals(et_input.getText().toString()) ) {
+                                        Toast.makeText(getApplication(), "단어 목록을 입력하세요.", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        alertDialog.dismiss();
+
+                                        String[] words = et_input.getText().toString().toLowerCase().split(",");
+                                        for ( int i = 0; i < words.length; i++ ) {
+                                            String word = words[i].trim();
+                                            HashMap wordInfo = DicDb.getWordInfo(db, word);
+                                            if ( wordInfo.containsKey("WORD") ) {
+                                                String mean = (String)wordInfo.get("MEAN");
+                                                String spelling = DicUtils.getString((String)wordInfo.get("SPELLING")).replace("[","").replace("]","");
+                                                String samples = DicDb.getWordSamples(db, word);
+
+                                                DicDb.insMyVocabulary(db, kind, word, mean, spelling, samples, "");
+                                            }
+                                        }
+
+                                        Toast.makeText(getApplicationContext(), "단어목록을 등록하였습니다.", Toast.LENGTH_LONG).show();
+
+                                        getListView();
+                                    }
+                                }
+                            });
+                            ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    alertDialog.dismiss();
+                                }
+                            });
+
+                            alertDialog.setCanceledOnTouchOutside(false);
+                            alertDialog.show();
                         }
                         DicUtils.setDbChange(getApplicationContext());  //DB 변경 체크
 
@@ -179,8 +284,16 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
         DicUtils.dicLog("onActivityResult : " + requestCode + " : " + resultCode);
 
         switch ( requestCode ) {
+            case CommConstants.a_vocabularyEdit :
+                if ( data != null && CommConstants.msgSave.equals(data.getStringExtra("MSG")) ) {
+                    getListView();
+                }
+
+                break;
             case CommConstants.a_dictionary :
-                getListView();
+                if ( data != null && CommConstants.msgAdd.equals(data.getStringExtra("MSG")) ) {
+                    getListView();
+                }
 
                 break;
             case CommConstants.a_daum :

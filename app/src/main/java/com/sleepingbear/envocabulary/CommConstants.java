@@ -44,6 +44,9 @@ public class CommConstants {
         public final static int a_daum = 4;
         public final static int a_vocabularyEdit = 5;
 
+        public final static String msgAdd = "ADD";
+        public final static String msgSave = "SAVE";
+
         public static String flag_mainNews = "MAIN_NEWS";
 
 

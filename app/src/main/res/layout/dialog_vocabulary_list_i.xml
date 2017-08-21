@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="등록할 단어를 ','로 구분해서 입력하세요."
+                android:id="@+id/my_tv_label"
+                android:layout_centerInParent="false"
+                android:layout_alignParentLeft="false"
+                android:layout_marginLeft="10dp"
+                android:textSize="14dp"
+                android:layout_alignParentBottom="false"
+                android:layout_marginTop="10dp" />
+            <EditText
+                android:layout_width="match_parent"
+                android:id="@+id/my_et_input"
+                android:layout_centerVertical="false"
+                android:layout_centerHorizontal="false"
+                android:layout_alignParentLeft="false"
+                android:background="@drawable/my_edittext"
+                android:layout_marginLeft="10dp"
+                android:layout_alignParentTop="false"
+                android:inputType="textMultiLine"
+                android:layout_below="@+id/my_tv_label"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:layout_height="190dp" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/my_divider"
+        android:layout_alignParentTop="true"
+        android:id="@+id/linearLayout9"
+        android:layout_marginTop="10dp" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:layout_height="30dp"
+            android:text="확인"
+            android:id="@+id/my_b_save"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/my_button"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_width="60dp" />
+
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="30dp"
+            android:text="닫기"
+            android:id="@+id/my_b_close"
+            android:layout_gravity="right"
+            android:layout_alignParentRight="false"
+            android:layout_centerInParent="false"
+            android:background="@drawable/my_button"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_toLeftOf="@+id/my_b_save" />
+    </RelativeLayout>
+
+</LinearLayout>

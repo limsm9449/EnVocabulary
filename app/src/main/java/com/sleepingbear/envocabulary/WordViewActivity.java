@@ -219,15 +219,17 @@ public class WordViewActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            switch (keyCode) {
-                case KeyEvent.KEYCODE_BACK:
-                    if ( webView.canGoBack() ) {
-                        webView.goBack();
-                    } else {
-                        //Toast.makeText(getApplicationContext(), "상단의 Back 버튼을 클릭해주세요.", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                    return true;
+            if ( !"Sample".equals(site) ) {
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_BACK:
+                        if (webView.canGoBack()) {
+                            webView.goBack();
+                        } else {
+                            //Toast.makeText(getApplicationContext(), "상단의 Back 버튼을 클릭해주세요.", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                        return true;
+                }
             }
         }
         return super.onKeyDown(keyCode, event);

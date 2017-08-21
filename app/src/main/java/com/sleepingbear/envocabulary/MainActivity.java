@@ -14,11 +14,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
-import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +26,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -41,13 +38,7 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DbHelper dbHelper;
@@ -349,6 +340,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //layout 구성
             final View dialog_layout = inflater.inflate(R.layout.dialog_category_iud, null);
 
+            final String kind = cur.getString(cur.getColumnIndexOrThrow("KIND"));
+
             //dialog 생성..
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setView(dialog_layout);
@@ -356,15 +349,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             ((TextView) dialog_layout.findViewById(R.id.my_d_category_tv_category)).setText("단어장 관리");
 
-            final EditText et_upd = ((EditText) dialog_layout.findViewById(R.id.my_d_category_et_upd));
+            final EditText et_upd = ((EditText) dialog_layout.findViewById(R.id.my_et_upd));
             et_upd.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
 
-            ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upd)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-            ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upd)).setOnClickListener(new View.OnClickListener() {
+            ((Button) dialog_layout.findViewById(R.id.my_b_upd)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String code = (String) v.getTag();
-                    if ("VOC0001".equals(code)) {
+                    if ("VOC0001".equals(kind)) {
                         Toast.makeText(getApplicationContext(), "기본 단어장은 수정할 수 없습니다.", Toast.LENGTH_SHORT).show();
                         alertDialog.dismiss();
                     } else {
@@ -373,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         } else {
                             alertDialog.dismiss();
 
-                            db.execSQL(DicQuery.getUpdCategory(CommConstants.vocabularyCode, code, et_upd.getText().toString()));
+                            db.execSQL(DicQuery.getUpdCategory(CommConstants.vocabularyCode, kind, et_upd.getText().toString()));
 
                             changeListView();
 
@@ -383,13 +374,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
 
-            ((Button) dialog_layout.findViewById(R.id.my_d_category_b_del)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-            ((Button) dialog_layout.findViewById(R.id.my_d_category_b_del)).setOnClickListener(new View.OnClickListener() {
+            ((Button) dialog_layout.findViewById(R.id.my_b_del)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String code = (String) v.getTag();
-
-                    if ("VOC0001".equals(code)) {
+                    if ("VOC0001".equals(kind)) {
                         Toast.makeText(getApplicationContext(), "기본 단어장은 삭제할 수 없습니다.", Toast.LENGTH_SHORT).show();
                         alertDialog.dismiss();
                     } else {
@@ -401,8 +389,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     public void onClick(DialogInterface dialog, int which) {
                                         alertDialog.dismiss();
 
-                                        db.execSQL(DicQuery.getDelCategory(CommConstants.vocabularyCode, code));
-                                        db.execSQL(DicQuery.getDelDicVoc(code));
+                                        db.execSQL(DicQuery.getDelCategory(CommConstants.vocabularyCode, kind));
+                                        db.execSQL(DicQuery.getDelDicVoc(kind));
 
                                         DicUtils.setDbChange(getApplicationContext());  //DB 변경 체크
 
@@ -421,125 +409,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
 
-            final EditText et_saveName = ((EditText) dialog_layout.findViewById(R.id.my_dc_et_voc_name));
-            et_saveName.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")));
-            ((Button) dialog_layout.findViewById(R.id.my_dc__b_save)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-            ((Button) dialog_layout.findViewById(R.id.my_dc__b_save)).setOnClickListener(new View.OnClickListener() {
+            final EditText et_saveName = ((EditText) dialog_layout.findViewById(R.id.my_et_voc_name));
+            et_saveName.setText(cur.getString(cur.getColumnIndexOrThrow("KIND_NAME")) + ".xls");
+            ((Button) dialog_layout.findViewById(R.id.my_b_download)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String code = (String) v.getTag();
 
                     String saveFileName = et_saveName.getText().toString();
                     if ("".equals(saveFileName)) {
                         Toast.makeText(getApplicationContext(), "저장할 파일명을 입력하세요.", Toast.LENGTH_SHORT).show();
-                    } else if (saveFileName.indexOf(".") > -1 && !"txt".equals(saveFileName.substring(saveFileName.length() - 3, saveFileName.length()).toLowerCase())) {
-                        Toast.makeText(getApplicationContext(), "확장자는 txt 입니다.", Toast.LENGTH_SHORT).show();
+                    } else if (saveFileName.indexOf(".") > -1 && !"xls".equals(saveFileName.substring(saveFileName.length() - 3, saveFileName.length()).toLowerCase())) {
+                        Toast.makeText(getApplicationContext(), "확장자는 xls 입니다.", Toast.LENGTH_SHORT).show();
                     } else {
-                        String fileName = "";
+                        String fileName = DicUtils.getFileName(saveFileName, "xls");
 
-                        File appDir = new File(Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName);
-                        if (!appDir.exists()) {
-                            appDir.mkdirs();
-
-                            if (saveFileName.indexOf(".") > -1) {
-                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName;
-                            } else {
-                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName + ".txt";
-                            }
-                        } else {
-                            if (saveFileName.indexOf(".") > -1) {
-                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName;
-                            } else {
-                                fileName = Environment.getExternalStorageDirectory().getAbsoluteFile() + CommConstants.folderName + "/" + saveFileName + ".txt";
-                            }
-                        }
-
-                        File saveFile = new File(fileName);
-                        if (saveFile.exists()) {
-                            Toast.makeText(getApplicationContext(), "파일명이 존재합니다.", Toast.LENGTH_SHORT).show();
-                            ;
-                        } else {
-                            try {
-                                saveFile.createNewFile();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } finally {
-                            }
-
-                            BufferedWriter bw = null;
-                            try {
-                                bw = new BufferedWriter(new FileWriter(saveFile, true));
-
-                                Cursor cursor = db.rawQuery(DicQuery.getSaveVocabulary(code), null);
-                                while (cursor.moveToNext()) {
-                                    bw.write(cursor.getString(cursor.getColumnIndexOrThrow("WORD")) + ": " + cursor.getString(cursor.getColumnIndexOrThrow("SPELLING")) + " -> " + cursor.getString(cursor.getColumnIndexOrThrow("MEAN")));
-                                    bw.newLine();
-                                }
-
-                                bw.flush();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } finally {
-                                if (bw != null) try {
-                                    bw.close();
-                                } catch (IOException ioe2) {
-                                }
-                            }
-
+                        Cursor cursor = db.rawQuery(DicQuery.getSaveMyVocabulary(kind), null);
+                        boolean isSave = DicUtils.writeExcelVocabulary(fileName, cursor);
+                        if ( isSave ) {
                             Toast.makeText(getApplicationContext(), "단어장을 정상적으로 내보냈습니다.", Toast.LENGTH_SHORT).show();
-
                             alertDialog.dismiss();
                         }
                     }
                 }
             });
 
-            ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upload)).setTag(cur.getString(cur.getColumnIndexOrThrow("KIND")));
-            ((Button) dialog_layout.findViewById(R.id.my_d_category_b_upload)).setOnClickListener(new View.OnClickListener() {
+            ((Button) dialog_layout.findViewById(R.id.my_b_upload)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    final String code = (String) v.getTag();
-
                     FileChooser filechooser = new FileChooser(MainActivity.this);
                     filechooser.setFileListener(new FileChooser.FileSelectedListener() {
                         @Override
                         public void fileSelected(final File file) {
-                            FileInputStream fis = null;
-                            try {
-                                fis = new FileInputStream(new File(file.getAbsolutePath()));
-                                InputStreamReader isr = new InputStreamReader(fis);
-                                BufferedReader buffreader = new BufferedReader(isr);
-
-                                String readString = buffreader.readLine();
-                                while (readString != null) {
-                                    String[] dicInfo = readString.split(":");
-                                    String entryId = DicDb.getEntryIdForWord(db, dicInfo[0]);
-                                    DicDb.insDicVoc(db, entryId, code);
-
-                                    readString = buffreader.readLine();
-                                }
-                                isr.close();
-
-                                DicUtils.setDbChange(getApplicationContext()); //변경여부 체크
-
-                                changeListView();
-
+                            boolean isSave = DicUtils.readExcelVocabulary(db, file, kind, false);
+                            if ( isSave ) {
                                 Toast.makeText(getApplicationContext(), "단어장을 정상적으로 가져왔습니다.", Toast.LENGTH_SHORT).show();
-
                                 alertDialog.dismiss();
-
                                 changeListView();
-                            } catch (Exception e) {
-                                e.printStackTrace();
                             }
                         }
                     });
-                    filechooser.setExtension("txt");
+                    filechooser.setExtension("xls");
                     filechooser.showDialog();
                 }
             });
 
-            ((Button) dialog_layout.findViewById(R.id.my_d_category_b_close)).setOnClickListener(new View.OnClickListener() {
+            ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
                                                                                                      @Override
                                                                                                      public void onClick(View v) {
                                                                                                          alertDialog.dismiss();

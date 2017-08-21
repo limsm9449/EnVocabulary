@@ -17,7 +17,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +88,21 @@ public class DaumVocabularyActivity extends AppCompatActivity {
                 //메뉴 갱신
                 invalidateOptionsMenu();
 
-                changeListView();
+                if ( "TOEIC,TOEFL,TEPS,수능영어,NEAT/NEPT,초중고영어,회화,기타".indexOf(daumKind) > -1 ) {
+                    if (DicUtils.equalPreferencesDate(getApplicationContext(), daumKind)) {
+                        changeListView();
+                    } else {
+                        if (DicUtils.isNetWork(DaumVocabularyActivity.this)) {
+                            task = new DicCategoryTask();
+                            task.execute();
+                        } else {
+                            changeListView();
+                            Toast.makeText(getApplicationContext(), "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } else {
+                    changeListView();
+                }
             }
 
             @Override
@@ -119,21 +132,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
         });
         spinner.setSelection(3);
 
-        if ( "TOEIC,TOEFL,TEPS,수능영어,NEAT/NEPT,초중고영어,회화,기타".indexOf(daumKind) > -1 ) {
-            if (DicUtils.equalPreferencesDate(getApplicationContext(), daumKind)) {
-                changeListView();
-            } else {
-                if (DicUtils.isNetWork(this)) {
-                    task = new DicCategoryTask();
-                    task.execute();
-                } else {
-                    changeListView();
-                    Toast.makeText(getApplicationContext(), "인터넷에 연결되어 있지 않습니다.", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } else {
-            changeListView();
-        }
+
 
         AdView av = (AdView)this.findViewById(R.id.adView);
         AdRequest adRequest = new  AdRequest.Builder().build();
@@ -142,7 +141,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
 
     public void changeListView() {
         //정렬 보여주기
-        if (!"DAILY".equals(daumKind)) {
+        if ( "R1,R2,R3".indexOf(daumKind) < 0 ) {
             Spinner spinner = (Spinner) this.findViewById(R.id.my_s_daumOrd);
             spinner.setVisibility(View.VISIBLE);
         } else {
@@ -189,7 +188,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
             final Cursor cur = (Cursor) adapter.getItem(position);
             categoryId = cur.getString(cur.getColumnIndexOrThrow("CATEGORY_ID"));
 
-            if ( DicDb.isExistDaumCategoryVocabulary(db, categoryId) ) {
+            if ( "R1,R2,R3".indexOf(daumKind) > -1 || DicDb.isExistDaumCategoryVocabulary(db, categoryId) ) {
                 //layout 구성
                 //메뉴 선택 다이얼로그 생성
                 Cursor cursor = db.rawQuery(DicQuery.getVocabularyCategory(), null);
@@ -226,10 +225,10 @@ public class DaumVocabularyActivity extends AppCompatActivity {
                         builder.setView(dialog_layout);
                         final AlertDialog alertDialog = builder.create();
 
-                        final EditText et_voc_name = ((EditText) dialog_layout.findViewById(R.id.my_dc_et_voc_name));
+                        final EditText et_voc_name = ((EditText) dialog_layout.findViewById(R.id.my_et_voc_name));
                         et_voc_name.setText(cur.getString(cur.getColumnIndexOrThrow("CATEGORY_NAME")));
 
-                        ((Button) dialog_layout.findViewById(R.id.my_dc_b_save)).setOnClickListener(new View.OnClickListener() {
+                        ((Button) dialog_layout.findViewById(R.id.my_b_download)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if ("".equals(et_voc_name.getText().toString())) {
@@ -242,7 +241,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
                                     String insCategoryCode = DicQuery.getInsCategoryCode(db);
                                     db.execSQL(DicQuery.getInsNewCategory(CommConstants.vocabularyCode, insCategoryCode, vocName));
 
-                                    DicDb.insMyVocabularyFromDaumCategory(db, insCategoryCode, categoryId);
+                                    DicDb.insMyVocabularyFromDaumCategory(db, daumKind, insCategoryCode, categoryId);
 
                                     DicUtils.setDbChange(getApplicationContext()); //변경여부 체크
 
@@ -266,7 +265,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
                 dlg.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        DicDb.insMyVocabularyFromDaumCategory(db, kindCodes[mSelect], categoryId);
+                        DicDb.insMyVocabularyFromDaumCategory(db, daumKind, kindCodes[mSelect], categoryId);
 
                         DicUtils.setDbChange(getApplicationContext()); //변경여부 체크
                     }

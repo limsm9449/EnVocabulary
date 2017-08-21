@@ -56,6 +56,8 @@ public class DictionaryActivity extends AppCompatActivity implements View.OnClic
     private String mWsKind = "W";
     private String mCategoryKind = "";
 
+    private boolean isAddVocabulary = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,6 +139,12 @@ public class DictionaryActivity extends AppCompatActivity implements View.OnClic
             //소프트 키보드 없애기
             InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(et_search.getWindowToken(), 0);
+
+            if ( isAddVocabulary ) {
+                Intent intent = new Intent();
+                intent.putExtra("MSG", CommConstants.msgAdd);
+                setResult(RESULT_OK, intent);
+            }
 
             finish();
         }
@@ -311,7 +319,7 @@ public class DictionaryActivity extends AppCompatActivity implements View.OnClic
 
             Cursor cur = (Cursor) adapter.getItem(i);
 
-            if ( !"SAMPLE".equals(cur.getString(cur.getColumnIndexOrThrow("KIND"))) ) {
+            if ( "F".equals(cur.getString(cur.getColumnIndexOrThrow("KIND"))) ) {
                 //단어장 다이얼로그 생성
                 Cursor cursor = db.rawQuery(DicQuery.getVocabularyCategory(), null);
 
@@ -356,6 +364,8 @@ public class DictionaryActivity extends AppCompatActivity implements View.OnClic
                         Cursor cur = (Cursor) adapter.getCursor();
                         DicDb.insMyVocabularyFromDic(db, cur.getString(cur.getColumnIndexOrThrow("ENTRY_ID")), kindCodes[dSelect]);
                         DicUtils.setDbChange(getApplicationContext()); //변경여부 체크
+
+                        isAddVocabulary = true;
                     }
                 });
 

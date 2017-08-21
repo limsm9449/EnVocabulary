@@ -779,14 +779,19 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getDaumCategoryVocabulary(String categoryId) {
+    public static String getDaumCategoryVocabulary(String kind, String categoryId) {
         StringBuffer sql = new StringBuffer();
 
-        sql.append("SELECT SEQ _id, SEQ, WORD, SPELLING, MEAN, SAMPLES, MEMO" + CommConstants.sqlCR);
-        sql.append("  FROM DAUM_CATEGORY_VOC" + CommConstants.sqlCR);
-        sql.append(" WHERE CATEGORY_ID = '" + categoryId + "'" + CommConstants.sqlCR);
-        sql.append(" ORDER BY WORD" + CommConstants.sqlCR);
-
+        if ( "R1,R2,R3".indexOf(kind) < 0 ) {
+            sql.append("SELECT SEQ _id, SEQ, WORD, SPELLING, MEAN, SAMPLES, MEMO" + CommConstants.sqlCR);
+            sql.append("  FROM DAUM_CATEGORY_VOC" + CommConstants.sqlCR);
+            sql.append(" WHERE CATEGORY_ID = '" + categoryId + "'" + CommConstants.sqlCR);
+            sql.append(" ORDER BY WORD" + CommConstants.sqlCR);
+        } else {
+            sql.append("SELECT SEQ _id, SEQ, WORD, SPELLING, MEAN, '' SAMPLES, '' MEMO" + CommConstants.sqlCR);
+            sql.append("  FROM DIC" + CommConstants.sqlCR);
+            sql.append(" WHERE ENTRY_ID IN (SELECT ENTRY_ID FROM DAUM_VOCABULARY WHERE CATEGORY_ID = '" + categoryId + "')" + CommConstants.sqlCR);
+        }
         DicUtils.dicSqlLog(sql.toString());
 
         return sql.toString();
@@ -810,6 +815,18 @@ public class DicQuery {
         sql.append("   SET RANDOM_SEQ = RANDOM()" + CommConstants.sqlCR);
         sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
 
+        DicUtils.dicSqlLog(sql.toString());
+
+        return sql.toString();
+    }
+
+    public static String getSaveMyVocabulary(String kind) {
+        StringBuffer sql = new StringBuffer();
+
+        sql.append("SELECT WORD, SPELLING, MEAN, SAMPLES, MEMO" + CommConstants.sqlCR);
+        sql.append("  FROM DIC_MY_VOC" + CommConstants.sqlCR);
+        sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+        sql.append(" ORDER BY WORD" + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
 
         return sql.toString();
