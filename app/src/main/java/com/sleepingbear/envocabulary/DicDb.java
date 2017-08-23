@@ -902,8 +902,8 @@ public class DicDb {
     public static void insMyVocabulary(SQLiteDatabase db, String kind, String word, String mean, String spelling, String samples, String memo) {
         StringBuffer sql = new StringBuffer();
         sql.append("DELETE FROM DIC_MY_VOC " + CommConstants.sqlCR);
-        sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
-        sql.append("   AND WORD = '" + word + "'" + CommConstants.sqlCR);
+        sql.append(" WHERE KIND = '" + kind.replaceAll("'","''") + "'" + CommConstants.sqlCR);
+        sql.append("   AND WORD = '" + word.replaceAll("'","''") + "'" + CommConstants.sqlCR);
         //DicUtils.dicSqlLog(sql.toString());
         db.execSQL(sql.toString());
 
@@ -987,4 +987,31 @@ public class DicDb {
         }
         cursor.close();
     }
+
+    public static void delCategory(SQLiteDatabase db, String codeGroup, String code) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("DELETE FROM DIC_CODE" + CommConstants.sqlCR);
+        sql.append(" WHERE CODE_GROUP = '" + codeGroup + "'" + CommConstants.sqlCR);
+        sql.append("   AND CODE = '" + code + "'" + CommConstants.sqlCR);
+        //DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
+    public static void delMyVocabularyAll(SQLiteDatabase db, String kind) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("DELETE FROM DIC_MY_VOC" + CommConstants.sqlCR);
+        sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+        //DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
+    public static void insMyVocabulary(SQLiteDatabase db, String kind, String word, String mean, String spelling, String samples, String memo, String memorization, String insDate) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("INSERT INTO DIC_MY_VOC (KIND, WORD, MEAN, SPELLING, SAMPLES, MEMO, MEMORIZATION, INS_DATE) " + CommConstants.sqlCR);
+        sql.append("VALUES ('" + kind + "', '" + word.replaceAll("'","''") + "','" + mean.replaceAll("'","''") + "','" + spelling.replaceAll("'","''") + "','" +
+                samples.replaceAll("'","''") + "','" + memo.replaceAll("'","''") + "','" + memorization.replaceAll("'","''") + "','" + insDate.replaceAll("'","''") + "') " + CommConstants.sqlCR);
+        DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
 }

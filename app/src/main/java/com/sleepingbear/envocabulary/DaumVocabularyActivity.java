@@ -228,7 +228,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
                         final EditText et_voc_name = ((EditText) dialog_layout.findViewById(R.id.my_et_voc_name));
                         et_voc_name.setText(cur.getString(cur.getColumnIndexOrThrow("CATEGORY_NAME")));
 
-                        ((Button) dialog_layout.findViewById(R.id.my_b_download)).setOnClickListener(new View.OnClickListener() {
+                        ((Button) dialog_layout.findViewById(R.id.my_b_save)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 if ("".equals(et_voc_name.getText().toString())) {
@@ -250,7 +250,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
                             }
                         });
 
-                        ((Button) dialog_layout.findViewById(R.id.my_dc_b_close)).setOnClickListener(new View.OnClickListener() {
+                        ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 alertDialog.dismiss();

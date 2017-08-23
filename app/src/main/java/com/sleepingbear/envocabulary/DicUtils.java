@@ -1075,7 +1075,9 @@ public class DicUtils {
                         if ( wordInfo.containsKey("WORD") ) {
                             String mean = (String)wordInfo.get("MEAN");
                             String spelling = DicUtils.getString((String)wordInfo.get("SPELLING")).replace("[","").replace("]","");
-                            String samples = DicDb.getWordSamples(db, word);
+                            //String samples = DicDb.getWordSamples(db, word);
+                            String samples = "";
+                            String memo = "";
 
                             DicDb.insMyVocabulary(db, kind, word, mean, spelling, samples, "");
                         }
@@ -1121,5 +1123,150 @@ public class DicUtils {
             return true;
         }
         return false;
+    }
+
+    public static boolean writeExcelBackup(Context ctx, SQLiteDatabase db, String fileName) {
+        dicLog("writeExcelBackup start");
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+            dicLog("Storage not available or read only");
+            return false;
+        }
+
+        boolean success = false;
+
+        try {
+            FileOutputStream fos = null;
+
+            if ( "".equals(fileName) ) {
+                fos = ctx.openFileOutput(CommConstants.systemBackupFile, Context.MODE_PRIVATE);
+            } else {
+                File saveFile = new File(fileName);
+                try {
+                    saveFile.createNewFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                }
+                fos = new FileOutputStream(saveFile);
+            }
+
+            HSSFWorkbook workbook = new HSSFWorkbook();
+            HSSFSheet sheet = workbook.createSheet("backup");
+            int rowIdx = 0;
+            int cellIdx = 0;
+            HSSFCell c = null;
+
+            StringBuffer sql = new StringBuffer();
+
+            //단어 카테고리 저장
+            sql.append("SELECT A.CODE_GROUP, A.CODE, A.CODE_NAME" + CommConstants.sqlCR);
+            sql.append("  FROM DIC_CODE A" + CommConstants.sqlCR);
+            sql.append(" WHERE CODE_GROUP IN ('MY_VOC','C01','C02')" + CommConstants.sqlCR);
+            sql.append("   AND CODE NOT IN ('VOC0001','C010001')" + CommConstants.sqlCR);
+            Cursor cursor = db.rawQuery(sql.toString(), null);
+            while (cursor.moveToNext()) {
+                HSSFRow row = sheet.createRow(rowIdx++);
+
+                cellIdx = 0;
+                putCell(row, cellIdx++, CommConstants.tag_code_ins);
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("CODE_GROUP")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("CODE")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("CODE_NAME")));
+            }
+            cursor.close();
+
+            //단어장 저장
+            sql.setLength(0);
+            sql.append("SELECT KIND, WORD, MEAN, SPELLING, SAMPLES, MEMO, MEMORIZATION, INS_DATE" + CommConstants.sqlCR);
+            sql.append("  FROM DIC_MY_VOC" + CommConstants.sqlCR);
+            cursor = db.rawQuery(sql.toString(), null);
+            while (cursor.moveToNext()) {
+                HSSFRow row = sheet.createRow(rowIdx++);
+
+                cellIdx = 0;
+                putCell(row, cellIdx++, CommConstants.tag_voc_ins);
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("KIND")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("WORD")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("MEAN")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("SPELLING")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("SAMPLES")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("MEMO")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("MEMORIZATION")));
+                putCell(row, cellIdx++, cursor.getString(cursor.getColumnIndexOrThrow("INS_DATE")));
+            }
+            cursor.close();
+
+            workbook.write(fos);
+
+            success = true;
+
+            fos.close();
+        } catch (Exception e) {
+            DicUtils.dicLog("writeExcelBackup 에러=" + e.toString());
+        }
+
+        System.out.println("writeExcelBackup end");
+
+        return success;
+    }
+
+    public static boolean readExcelBackup(Context ctx, SQLiteDatabase db, File file) {
+        dicLog("readExcelBackup start");
+        if (!isExternalStorageAvailable() || isExternalStorageReadOnly()) {
+            dicLog("Storage not available or read only");
+            return false;
+        }
+
+        boolean success = false;
+
+        try{
+            //데이타 초기화
+            DicDb.initMyVocabulary(db);
+
+            FileInputStream fis = null;
+            if ( file == null ) {
+                fis = ctx.openFileInput(CommConstants.systemBackupFile);
+            } else {
+                fis = new FileInputStream(file);
+            }
+
+            POIFSFileSystem myFileSystem = new POIFSFileSystem(fis);
+            HSSFWorkbook workbook = new HSSFWorkbook(myFileSystem);
+            HSSFSheet mySheet = workbook.getSheetAt(0);
+
+            Iterator<Row> rowIter = mySheet.rowIterator();
+            while ( rowIter.hasNext() ) {
+                HSSFRow myRow = (HSSFRow) rowIter.next();
+
+                int idx = 0;
+
+                String kind = getString(myRow.getCell(idx++).toString());
+                if ( kind.equals(CommConstants.tag_code_ins) ) {
+                    DicDb.insCode(db
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString()));
+                } else if ( kind.equals(CommConstants.tag_voc_ins) ) {
+                    DicDb.insMyVocabulary(db
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString())
+                            , getString(myRow.getCell(idx++).toString()));
+                }
+            }
+
+            success = true;
+            fis.close();
+        } catch (Exception e) {
+            DicUtils.dicLog("readExcelBackup 에러=" + e.toString());
+        }
+
+        System.out.println("readExcelBackup end");
+
+        return success;
     }
 }

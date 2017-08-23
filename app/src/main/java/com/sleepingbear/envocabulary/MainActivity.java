@@ -118,11 +118,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if ( "Y".equals(prefs.getString("db_new", "N")) ) {
             DicUtils.dicLog("backup data import");
 
-            DicUtils.readInfoFromFile(this, db, "");
+            DicUtils.readExcelBackup(this, db, null);
 
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("db_new", "N");
             editor.commit();
+            Toast.makeText(getApplicationContext(), "DB 변경되었습니다.\n기존 데이타를 복구하였습니다.", Toast.LENGTH_LONG).show();
         }
 
         checkPermission();
@@ -215,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //종료 시점에 변경 사항을 기록한다.
         if ( "Y".equals(DicUtils.getDbChange(getApplicationContext())) ) {
-            DicUtils.writeInfoToFile(this, db, "");
+            DicUtils.writeExcelBackup(this, db, "");
             DicUtils.clearDbChange(this);
         }
 
@@ -365,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             alertDialog.dismiss();
 
                             db.execSQL(DicQuery.getUpdCategory(CommConstants.vocabularyCode, kind, et_upd.getText().toString()));
+                            DicUtils.setDbChange(getApplicationContext());  //DB 변경 체크
 
                             changeListView();
 
@@ -389,8 +391,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     public void onClick(DialogInterface dialog, int which) {
                                         alertDialog.dismiss();
 
-                                        db.execSQL(DicQuery.getDelCategory(CommConstants.vocabularyCode, kind));
-                                        db.execSQL(DicQuery.getDelDicVoc(kind));
+                                        DicDb.delCategory(db, CommConstants.vocabularyCode, kind);
+                                        DicDb.delMyVocabularyAll(db, kind);
 
                                         DicUtils.setDbChange(getApplicationContext());  //DB 변경 체크
 
@@ -414,7 +416,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ((Button) dialog_layout.findViewById(R.id.my_b_download)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
                     String saveFileName = et_saveName.getText().toString();
                     if ("".equals(saveFileName)) {
                         Toast.makeText(getApplicationContext(), "저장할 파일명을 입력하세요.", Toast.LENGTH_SHORT).show();

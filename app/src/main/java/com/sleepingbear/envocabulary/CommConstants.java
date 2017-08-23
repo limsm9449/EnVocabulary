@@ -28,6 +28,7 @@ public class CommConstants {
 
         public static String infoFileName = "envocabulary.txt";
         public static String folderName = "/envocabulary";
+        public static String systemBackupFile = "envocabulary.xls";
 
         //코드 등록
         public static String tag_code_ins = "C_CODE_INS" ;

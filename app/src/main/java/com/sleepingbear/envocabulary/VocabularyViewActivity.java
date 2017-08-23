@@ -2,11 +2,14 @@ package com.sleepingbear.envocabulary;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -58,6 +61,9 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
     private boolean isChange = false;
     private boolean isAllCheck = false;
     private boolean isEditing = false;
+
+    private VocabularyViewTask task;
+    private String taskKind = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -197,9 +203,11 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                                             if ( wordInfo.containsKey("WORD") ) {
                                                 String mean = (String)wordInfo.get("MEAN");
                                                 String spelling = DicUtils.getString((String)wordInfo.get("SPELLING")).replace("[","").replace("]","");
-                                                String samples = DicDb.getWordSamples(db, word);
+                                                //String samples = DicDb.getWordSamples(db, word);
+                                                String samples = "";
+                                                String memo = "";
 
-                                                DicDb.insMyVocabulary(db, kind, word, mean, spelling, samples, "");
+                                                DicDb.insMyVocabulary(db, kind, word, mean, spelling, samples, memo);
                                             }
                                         }
 
@@ -423,6 +431,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 adapter.delete(kind);
+                                DicUtils.setDbChange(getApplicationContext());  //DB 변경 체크
 
                                 isChange = true;
                             }
@@ -468,6 +477,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.copy(kind, kindCodes[mSelect]);
+                            DicUtils.setDbChange(getApplicationContext());  //DB 변경 체크
 
                             isChange = true;
                         }
@@ -509,6 +519,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             adapter.move(kind, kindCodes[mSelect]);
+                            DicUtils.setDbChange(getApplicationContext());  //DB 변경 체크
 
                             isChange = true;
                         }
@@ -581,6 +592,25 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
             ttsIntent.putExtra("words", words);
             ttsIntent.putExtra("means", means);
             startService(ttsIntent);
+        } else if (id == R.id.action_sample) {
+            new AlertDialog.Builder(VocabularyViewActivity.this)
+                    .setTitle("알림")
+                    .setMessage("예제가 없는 단어의 예제를 생성하시겠습니까?")
+                    .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            taskKind = "UPD_WORD_SAMPLE";
+                            task = new VocabularyViewTask();
+                            task.execute();
+
+                        }
+                    })
+                    .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    })
+                    .show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -596,6 +626,47 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
         setResult(RESULT_OK, intent);
 
         finish();
+    }
+
+    private class VocabularyViewTask extends AsyncTask<Void, Void, Void> {
+        private ProgressDialog pd;
+        private String contents = "";
+
+        @Override
+        protected void onPreExecute() {
+            pd = new ProgressDialog(VocabularyViewActivity.this);
+            pd.setIndeterminate(true);
+            pd.setCancelable(false);
+            pd.show();
+            pd.setContentView(R.layout.custom_progress);
+
+            pd.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+            pd.show();
+
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... arg0) {
+            if ( taskKind.equals("UPD_WORD_SAMPLE") ) {
+                DicDb.updSamplesAllFromDicMyVoc(db, kind);
+                DicUtils.setDbChange(getApplicationContext());
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            pd.dismiss();
+            task = null;
+
+            if ( taskKind.equals("UPD_WORD_SAMPLE") ) {
+                getListView();
+            }
+
+            super.onPostExecute(result);
+        }
     }
 }
 
@@ -672,6 +743,7 @@ class VocabularyViewCursorAdapter extends CursorAdapter {
                 ViewHolder viewHolder = (ViewHolder)v.getTag();
 
                 DicDb.updMyVocabularyMemory(mDb, viewHolder.kind, viewHolder.word, (((CheckBox) v).isChecked() ? "Y" : "N"));
+                DicUtils.setDbChange(context);  //DB 변경 체크
 
                 dataChange();
             }
