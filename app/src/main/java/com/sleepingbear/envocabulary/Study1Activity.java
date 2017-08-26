@@ -14,7 +14,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +29,7 @@ import com.google.android.gms.ads.AdView;
 public class Study1Activity extends AppCompatActivity implements View.OnClickListener {
     private String mVocKind;
     private String mMemorization;
+    private String mSort = "QUESTION ASC";
 
     private String mWordMean;
 
@@ -75,8 +75,9 @@ public class Study1Activity extends AppCompatActivity implements View.OnClickLis
         RadioButton rb_mean = (RadioButton) findViewById(R.id.my_a_study1_rb_mean);
         rb_mean.setOnClickListener(this);
 
-        Button b_random = (Button) findViewById(R.id.my_a_study1_b_random);
-        b_random.setOnClickListener(this);
+        findViewById(R.id.my_rb_sort_asc).setOnClickListener(this);
+        findViewById(R.id.my_rb_sort_desc).setOnClickListener(this);
+        findViewById(R.id.my_rb_sort_random).setOnClickListener(this);
 
         if ( "".equals(mMemorization) ) {
             ((RadioButton) findViewById(R.id.my_a_study1_rb_all)).setChecked(true);
@@ -113,7 +114,7 @@ public class Study1Activity extends AppCompatActivity implements View.OnClickLis
         if (mMemorization.length() == 1) {
             sql.append("   AND MEMORIZATION = '" + mMemorization + "' " + CommConstants.sqlCR);
         }
-        sql.append(" ORDER BY RANDOM_SEQ" + CommConstants.sqlCR);
+        sql.append(" ORDER BY " + mSort + CommConstants.sqlCR);
         DicUtils.dicSqlLog(sql.toString());
 
         Cursor cursor = db.rawQuery(sql.toString(), null);
@@ -154,7 +155,14 @@ public class Study1Activity extends AppCompatActivity implements View.OnClickLis
         } else if (v.getId() == R.id.my_a_study1_rb_mean) {
             mWordMean = "MEAN";
             getListView();
-        } else if (v.getId() == R.id.my_a_study1_b_random) {
+        } else if (v.getId() == R.id.my_rb_sort_asc) {
+            mSort = "QUESTION ASC";
+            getListView();
+        } else if (v.getId() == R.id.my_rb_sort_desc) {
+            mSort = "QUESTION DESC";
+            getListView();
+        } else if (v.getId() == R.id.my_rb_sort_random) {
+            mSort = "RANDOM_SEQ";
             db.execSQL(DicQuery.updMyVocabularyRandom(mVocKind));
             getListView();
         }

@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.SeekBar;
@@ -28,6 +29,7 @@ import com.google.android.gms.ads.AdView;
 public class Study3Activity extends AppCompatActivity implements View.OnClickListener {
     private String mVocKind;
     private String mMemorization;
+    private String mSort = "QUESTION ASC";
     private boolean mIsPlay = false;
 
     private String mWordMean = "WORD";
@@ -73,7 +75,9 @@ public class Study3Activity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.my_a_study3_rb_m_not).setOnClickListener(this);
         findViewById(R.id.my_a_study3_rb_word).setOnClickListener(this);
         findViewById(R.id.my_a_study3_rb_mean).setOnClickListener(this);
-        findViewById(R.id.my_a_study3_b_random).setOnClickListener(this);
+        findViewById(R.id.my_rb_sort_asc).setOnClickListener(this);
+        findViewById(R.id.my_rb_sort_desc).setOnClickListener(this);
+        findViewById(R.id.my_rb_sort_random).setOnClickListener(this);
         findViewById(R.id.my_a_study3_ib_first).setOnClickListener(this);
         findViewById(R.id.my_a_study3_ib_prev).setOnClickListener(this);
         findViewById(R.id.my_a_study3_ib_play).setOnClickListener(this);
@@ -171,9 +175,20 @@ public class Study3Activity extends AppCompatActivity implements View.OnClickLis
 
             mWordMean = "MEAN";
             getListView();
-        } else if (v.getId() == R.id.my_a_study3_b_random) {
+        } else if (v.getId() == R.id.my_rb_sort_asc) {
             mThread.interrupt();
 
+            mSort = "QUESTION ASC";
+            getListView();
+        } else if (v.getId() == R.id.my_rb_sort_desc) {
+            mThread.interrupt();
+
+            mSort = "QUESTION DESC";
+            getListView();
+        } else if (v.getId() == R.id.my_rb_sort_random) {
+            mThread.interrupt();
+
+            mSort = "RANDOM_SEQ";
             mDb.execSQL(DicQuery.updMyVocabularyRandom(mVocKind));
             getListView();
         } else if (v.getId() == R.id.my_a_study3_ib_first) {
@@ -275,7 +290,7 @@ public class Study3Activity extends AppCompatActivity implements View.OnClickLis
         if (mMemorization.length() == 1) {
             sql.append("   AND MEMORIZATION = '" + mMemorization + "' " + CommConstants.sqlCR);
         }
-        sql.append(" ORDER BY RANDOM_SEQ" + CommConstants.sqlCR);
+        sql.append(" ORDER BY " + mSort + CommConstants.sqlCR);
         mCursor = mDb.rawQuery(sql.toString(), null);
         if ( mCursor.moveToNext() ) {
             sb.setMax(mCursor.getCount() - 1);

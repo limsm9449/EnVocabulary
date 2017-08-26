@@ -548,12 +548,15 @@ public class DicQuery {
         return sql.toString();
     }
 
-    public static String getDaumSubCategoryCount(String kind, int mOrder) {
+    public static String getDaumSubCategoryCount(String kind, int mOrder, String search) {
         StringBuffer sql = new StringBuffer();
 
         sql.append("SELECT CATEGORY_ID _id, KIND, CATEGORY_ID, CATEGORY_NAME, UPD_DATE, WORD_CNT, BOOKMARK_CNT" + CommConstants.sqlCR);
         sql.append("  FROM DAUM_CATEGORY" + CommConstants.sqlCR);
         sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+        if ( !"".equals(search) ) {
+            sql.append(" AND CATEGORY_NAME LIKE '%" + search + "%'" + CommConstants.sqlCR);
+        }
         if ( mOrder == 0 ) {
             sql.append(" ORDER BY BOOKMARK_CNT" + CommConstants.sqlCR);
         } else if ( mOrder == 1 ) {

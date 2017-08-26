@@ -156,9 +156,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             editor.commit();
         }
         if ( showDialog ) {
-            String msg = "1. 학습할 단어를 엑셀로 정리하여 단어장으로 등록합니다..\n";
-            msg += "2. Daum 단어장에서 학습할 단어장을 다운로드하여 등록합니다.\n";
-            msg += "3. 단어학습에서 6가지 모드로 단어를 학습할 수 있습니다.\n";
+            String msg = "1. 6가지 방법으로 학습할 단어를 단어장에 등록할 수 있습니다.\n";
+            msg += "2. 내가 정리한 단어장을 엑셀로 다운받을 수 있습니다. 다른 사람에게 주거나, 다른 사람이 정리한 단어장을 등록해서 학습해보세요.\n";
+            msg += "3. 단어학습에서 6가지 모드로 단어를 학습 할 수 있습니다.\n";
 
             new AlertDialog.Builder(this)
                     .setTitle("알림" + (appHintDialogCount >= 0 ? " - " + ++appHintDialogCount : ""))
@@ -250,6 +250,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(new Intent(getApplication(), StudyActivity.class));
         } else if (id == R.id.nav_setting) {
             startActivityForResult(new Intent(getApplication(), SettingsActivity.class), CommConstants.a_setting);
+        } else if (id == R.id.nav_help) {
+            Bundle bundle = new Bundle();
+            Intent helpIntent = new Intent(getApplication(), HelpActivity.class);
+            helpIntent.putExtras(bundle);
+            startActivity(helpIntent);
         } else if (id == R.id.nav_share) {
             Intent msg = new Intent(Intent.ACTION_SEND);
             msg.addCategory(Intent.CATEGORY_DEFAULT);

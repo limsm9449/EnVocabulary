@@ -38,9 +38,20 @@
                 android:layout_height="30dp"
                 android:id="@+id/my_s_daumOrd"
                 android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentRight="false"
                 android:layout_alignParentEnd="false"
-                android:layout_marginLeft="5dp" />
+                android:layout_marginLeft="5dp"
+                android:layout_toLeftOf="@+id/my_iv_search" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:srcCompat="@drawable/ic_search_black_24dp"
+                android:id="@+id/my_iv_search"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp" />
         </RelativeLayout>
 
         <LinearLayout

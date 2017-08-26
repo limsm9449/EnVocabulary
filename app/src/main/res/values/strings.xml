@@ -26,6 +26,7 @@
     <string name="title_activity_word_view">단어 상세</string>
     <string name="title_activity_sentence_view">문장 상세</string>
     <string name="title_activity_settings">환경 설정</string>
+    <string name="title_activity_help">도움말</string>
     <string name="title_activity_study">단어학습</string>
     <string name="title_activity_study1">Study1Activity</string>
     <string name="title_activity_study2">Study2Activity</string>

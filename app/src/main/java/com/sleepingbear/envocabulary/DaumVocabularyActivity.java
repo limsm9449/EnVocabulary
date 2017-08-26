@@ -24,7 +24,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,10 +34,11 @@ import android.widget.Toast;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class DaumVocabularyActivity extends AppCompatActivity {
+public class DaumVocabularyActivity extends AppCompatActivity implements View.OnClickListener {
     private DbHelper dbHelper;
     private SQLiteDatabase db;
     public DaumVocabularyCursorAdapter adapter;
@@ -48,6 +51,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
     private int mSelect = 0;
     private Cursor cursor;
     private String mCategoryKind = "";
+    private String search = "";
 
     DicCategoryTask task;
 
@@ -84,6 +88,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 daumKind = ((Cursor) s_daumKind.getSelectedItem()).getString(1);
+                search = "";
 
                 //메뉴 갱신
                 invalidateOptionsMenu();
@@ -132,11 +137,42 @@ public class DaumVocabularyActivity extends AppCompatActivity {
         });
         spinner.setSelection(3);
 
-
+        ((ImageView) findViewById(R.id.my_iv_search)).setOnClickListener(this);
 
         AdView av = (AdView)this.findViewById(R.id.adView);
         AdRequest adRequest = new  AdRequest.Builder().build();
         av.loadAd(adRequest);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.my_iv_search) {
+            LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+            final View dialog_layout = inflater.inflate(R.layout.dialog_search, null);
+            AlertDialog.Builder builder = new AlertDialog.Builder(DaumVocabularyActivity.this);
+            builder.setView(dialog_layout);
+            final AlertDialog alertDialog = builder.create();
+
+            final EditText et_search = ((EditText) dialog_layout.findViewById(R.id.my_et_search));
+            et_search.setText(search);
+            ((Button) dialog_layout.findViewById(R.id.my_b_search)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    search = et_search.getText().toString();
+                    changeListView();
+                    alertDialog.dismiss();
+                }
+            });
+            ((Button) dialog_layout.findViewById(R.id.my_b_close)).setOnClickListener(new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+                      alertDialog.dismiss();
+                  }
+            });
+
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+        }
     }
 
     public void changeListView() {
@@ -149,7 +185,7 @@ public class DaumVocabularyActivity extends AppCompatActivity {
             spinner.setVisibility(View.GONE);
         }
 
-        cursor = db.rawQuery(DicQuery.getDaumSubCategoryCount(((Cursor) s_daumKind.getSelectedItem()).getString(1), mOrder), null);
+        cursor = db.rawQuery(DicQuery.getDaumSubCategoryCount(((Cursor) s_daumKind.getSelectedItem()).getString(1), mOrder, search), null);
 
         if ( cursor.getCount() == 0 ) {
             Toast.makeText(this, "검색된 데이타가 없습니다.", Toast.LENGTH_SHORT).show();
