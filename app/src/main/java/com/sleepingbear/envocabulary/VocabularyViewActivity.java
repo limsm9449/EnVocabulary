@@ -595,7 +595,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
         } else if (id == R.id.action_sample) {
             new AlertDialog.Builder(VocabularyViewActivity.this)
                     .setTitle("알림")
-                    .setMessage("예제가 없는 단어의 예제를 생성하시겠습니까?")
+                    .setMessage("예제가 없는 단어의 예제를 생성하시겠습니까?\n참고) 예문 검색시 시간이 조금 걸릴 수 있습니다.")
                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
