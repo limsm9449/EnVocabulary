@@ -64,7 +64,7 @@ public class HelpActivity extends AppCompatActivity {
         tempSb.append("* 단어장" + CommConstants.sqlCR);
         tempSb.append("- 단어장 목록을 보실 수 있습니다." + CommConstants.sqlCR);
         tempSb.append(" .하단의 + 버튼을 클릭해서 신규 단어장을 추가할 수 있습니다." + CommConstants.sqlCR);
-        tempSb.append(" .기존 단어장을 길게 클릭하시면 수정, 추가, 삭제,  내보내기, 가져오기를 하실 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .기존 단어장을 길게 클릭하시면 수정, 삭제,  내보내기, 가져오기를 하실 수 있습니다." + CommConstants.sqlCR);
         tempSb.append(" .단어장을 클릭하시면 등록된 단어를 보실 수 있습니다." + CommConstants.sqlCR);
         tempSb.append("" + CommConstants.sqlCR);
         allSb.append(tempSb.toString());
@@ -74,6 +74,32 @@ public class HelpActivity extends AppCompatActivity {
         tempSb.append("- 단어 목록 보실 수 있습니다." + CommConstants.sqlCR);
         tempSb.append(" .상단 수정 버튼능 클릭하면 단어장을 편집(삭제,복사,이동) 할 수 있습니다." + CommConstants.sqlCR);
         tempSb.append(" .상단 TTS 버튼을 클릭하면 단어,뜻을 들을 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .상세를 클릭하면 단어와 예제를 같이 보실 수 있습니다. 예제가 없을 경우 메뉴의'단어 예제 생성'으로 예제를 자동 등록할 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .메뉴의 '전체 암기','전체 미암기'로 암기 여부를 변경할 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append("" + CommConstants.sqlCR);
+        allSb.append(tempSb.toString());
+
+        tempSb.delete(0, tempSb.length());
+        tempSb.append("* 영한 사전" + CommConstants.sqlCR);
+        tempSb.append(" .단어를 조회한 후에 단어를 길게 클릭해서 단어장에 단어를 등록할 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .또는 Naver, Daum 웹으로 단어 검색을 할 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .단어를 클릭하시면 Naver 사전, Daum 사전, 예문을 보실 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append("" + CommConstants.sqlCR);
+        allSb.append(tempSb.toString());
+
+        tempSb.delete(0, tempSb.length());
+        tempSb.append("* Daum 단어장" + CommConstants.sqlCR);
+        tempSb.append(" .Daum 사이트에 있는 단어장을 통해서 단어를 공부 할 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .Toeic, Toefl, Teps...  카테고리를 선택한후에 단어장을 클릭하면 단어 목록을 볼 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .검색을 통해서 원하는 단어장을 찾을 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append(" .단어장을 길게 클릭해서 기존 단어장이나 신규 단어장에 단어를 추가할 수 있습니다." + CommConstants.sqlCR);
+        tempSb.append("    - 단, 처음에는 단어장의 단어가 동기화 되어있지 않기 때문에 단어장을 클릭해서 단어를 동기화 해야 합니다." + CommConstants.sqlCR);
+        tempSb.append("" + CommConstants.sqlCR);
+        allSb.append(tempSb.toString());
+
+        tempSb.delete(0, tempSb.length());
+        tempSb.append("* Daum 단어장 상세" + CommConstants.sqlCR);
+        tempSb.append(" .단어를 길게 클릭해서 기존 단어장에 단어를 추가할 수 있습니다." + CommConstants.sqlCR);
         tempSb.append("" + CommConstants.sqlCR);
         allSb.append(tempSb.toString());
 

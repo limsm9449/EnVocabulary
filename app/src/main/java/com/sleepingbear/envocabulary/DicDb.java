@@ -1014,4 +1014,22 @@ public class DicDb {
         db.execSQL(sql.toString());
     }
 
+    public static void updMyVocabularyAllMemory(SQLiteDatabase db, String kind) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("UPDATE DIC_MY_VOC" + CommConstants.sqlCR);
+        sql.append("   SET MEMORIZATION = 'Y'" + CommConstants.sqlCR);
+        sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+        //DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
+    public static void updMyVocabularyAllUnmemory(SQLiteDatabase db, String kind) {
+        StringBuffer sql = new StringBuffer();
+        sql.append("UPDATE DIC_MY_VOC" + CommConstants.sqlCR);
+        sql.append("   SET MEMORIZATION = 'N'" + CommConstants.sqlCR);
+        sql.append(" WHERE KIND = '" + kind + "'" + CommConstants.sqlCR);
+        //DicUtils.dicSqlLog(sql.toString());
+        db.execSQL(sql.toString());
+    }
+
 }

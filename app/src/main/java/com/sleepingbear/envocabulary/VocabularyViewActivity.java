@@ -611,6 +611,12 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                         }
                     })
                     .show();
+        } else if (id == R.id.action_all_memory) {
+            DicDb.updMyVocabularyAllMemory(db, kind);
+            getListView();
+        } else if (id == R.id.action_all_unmemory) {
+            DicDb.updMyVocabularyAllUnmemory(db, kind);
+            getListView();
         }
 
         return super.onOptionsItemSelected(item);

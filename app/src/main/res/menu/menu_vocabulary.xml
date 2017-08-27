@@ -11,4 +11,8 @@
         android:orderInCategory="300" app:showAsAction="never"/>
     <item android:id="@+id/action_sample" android:title="단어 예제 생성"
         android:orderInCategory="400" app:showAsAction="never"/>
+    <item android:id="@+id/action_all_memory" android:title="전체 암기"
+        android:orderInCategory="400" app:showAsAction="never"/>
+    <item android:id="@+id/action_all_unmemory" android:title="전체 미암기"
+        android:orderInCategory="400" app:showAsAction="never"/>
 </menu>
