@@ -14,6 +14,7 @@
     <string name="action_share">어플 공유</string>
     <string name="action_no_ad">광고 제거 어플(유료)</string>
     <string name="action_blank">Blank</string>
+    <string name="action_download">다운로드</string>
 
     <!-- My -->
     <string name="banner_ad_unit_id">ca-app-pub-3860766380986792/7533083043</string>

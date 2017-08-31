@@ -123,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString("db_new", "N");
             editor.commit();
-            Toast.makeText(getApplicationContext(), "DB 변경되었습니다.\n기존 데이타를 복구하였습니다.", Toast.LENGTH_LONG).show();
         }
 
         checkPermission();
