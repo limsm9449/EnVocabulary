@@ -1,6 +1,6 @@
 package com.sleepingbear.envocabulary;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -67,9 +67,9 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             final View dialog_layout = li.inflate(R.layout.dialog_backup, null);
 
             //dialog 생성..
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
             builder.setView(dialog_layout);
-            final AlertDialog alertDialog = builder.create();
+            final android.app.AlertDialog alertDialog = builder.create();
 
             final EditText et_saveName = ((EditText) dialog_layout.findViewById(R.id.my_d_dm_et_save));
             et_saveName.setText("backup_" + DicUtils.getCurrentDate() + ".xls");

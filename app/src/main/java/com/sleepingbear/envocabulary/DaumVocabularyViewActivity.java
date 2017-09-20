@@ -165,7 +165,7 @@ public class DaumVocabularyViewActivity extends AppCompatActivity {
         } else if (id == R.id.action_refresh) {
             isOne = true;
             if ( DicUtils.isNetWork(this) ) {
-                new AlertDialog.Builder(this)
+                new android.support.v7.app.AlertDialog.Builder(this)
                         .setTitle("알림")
                         .setMessage("단어 정보를 동기화 하시겠습니까?")
                         .setPositiveButton("확인", new DialogInterface.OnClickListener() {
