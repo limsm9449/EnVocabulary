@@ -271,7 +271,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                 mOrder = parent.getSelectedItemPosition();
 
                 if ( mOrder == 6 ) {
-                    Toast.makeText(getApplicationContext(), "Random으로 조회시 암기여부를 체크할때 정렬이 다시 되기 때문에 보여지는 것이 틀려집니다.", Toast.LENGTH_LONG).show();
+                    db.execSQL(DicQuery.updMyVocabularyRandom(kind));
                 }
 
                 getListView();
@@ -341,7 +341,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
         } else if ( mOrder == 5 ) {
             sql.append(" ORDER BY MEAN" + CommConstants.sqlCR);
         } else if ( mOrder == 6 ) {
-            sql.append(" ORDER BY RANDOM()" + CommConstants.sqlCR);
+            sql.append(" ORDER BY RANDOM_SEQ" + CommConstants.sqlCR);
         }
         DicUtils.dicSqlLog(sql.toString());
 
