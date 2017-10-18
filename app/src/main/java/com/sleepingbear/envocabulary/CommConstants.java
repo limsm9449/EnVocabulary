@@ -50,7 +50,5 @@ public class CommConstants {
 
         public static String flag_mainNews = "MAIN_NEWS";
 
-
-
-
+        public static boolean isFreeApp = true;
     }

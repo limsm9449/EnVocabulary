@@ -198,9 +198,7 @@ public class Study6Activity extends AppCompatActivity implements View.OnClickLis
         };
         registerReceiver(screenOnOff, intentFilter);
 
-        AdView av = (AdView)this.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        av.loadAd(adRequest);
+        DicUtils.setAdView(this);
     }
 
     public void getListView() {

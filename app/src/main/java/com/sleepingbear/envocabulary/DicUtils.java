@@ -9,7 +9,11 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -1268,5 +1272,15 @@ public class DicUtils {
         System.out.println("readExcelBackup end");
 
         return success;
+    }
+
+    public static void setAdView(AppCompatActivity app) {
+        AdView av = (AdView)app.findViewById(R.id.adView);
+        if ( CommConstants.isFreeApp ) {
+            AdRequest adRequest = new  AdRequest.Builder().build();
+            av.loadAd(adRequest);
+        } else {
+            av.setVisibility(View.GONE);
+        }
     }
 }

@@ -127,9 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         checkPermission();
 
-        AdView av = (AdView)findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        av.loadAd(adRequest);
+        DicUtils.setAdView(this);
 
         changeListView();
 
