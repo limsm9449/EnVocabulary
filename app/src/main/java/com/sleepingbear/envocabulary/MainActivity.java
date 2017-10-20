@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         changeListView();
 
         // 사용법 Dialog...
+        /*
         String appHintDialog = "20170813";
         int appHintDialogCount = prefs.getInt("appHintDialogCount", 3);
         //DicUtils.dicLog("appHintDialogCount : " + appHintDialogCount);
@@ -167,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     })
                     .show();
         }
+        */
     }
 
     public boolean checkPermission() {
