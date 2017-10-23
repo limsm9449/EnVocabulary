@@ -17,14 +17,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
-
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 
 public class Study1Activity extends AppCompatActivity implements View.OnClickListener {
     private String mVocKind;
@@ -117,9 +113,9 @@ public class Study1Activity extends AppCompatActivity implements View.OnClickLis
 
         Cursor cursor = db.rawQuery(sql.toString(), null);
         if ( cursor.getCount() == 0 ) {
-            new android.app.AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("알림")
-                    .setMessage("데이타가 없습니다.")
+                    .setMessage("데이타가 없습니다.\n암기 여부를 조정해 주세요.")
                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
