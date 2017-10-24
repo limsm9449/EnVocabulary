@@ -188,7 +188,7 @@ public class Study2Activity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.my_a_study3_rb_all) {
+        if (v.getId() == R.id.my_a_study2_rb_all) {
             mMemorization = "";
             getListView();
         } else if (v.getId() == R.id.my_a_study2_rb_m) {
