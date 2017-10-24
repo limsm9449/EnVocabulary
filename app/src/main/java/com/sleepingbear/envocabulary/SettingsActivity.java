@@ -103,7 +103,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             alertDialog.setCanceledOnTouchOutside(false);
             alertDialog.show();
         } else if ( preference.getKey().equals("key_recovery") ) {
-            FileChooser filechooser = new FileChooser(SettingsActivity.this);
+            FileChooser filechooser = new FileChooser(SettingsActivity.this, "xls");
             filechooser.setFileListener(new FileChooser.FileSelectedListener() {
                 @Override
                 public void fileSelected(final File file) {
@@ -113,7 +113,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                     }
                 }
             });
-            filechooser.setExtension("xls");
+            //filechooser.setExtension("xls");
             filechooser.showDialog();
         } else if ( preference.getKey().equals("key_voc_clear") ) {
             new AlertDialog.Builder(this)

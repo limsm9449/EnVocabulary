@@ -115,7 +115,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            FileChooser filechooser = new FileChooser(VocabularyViewActivity.this);
+                                            FileChooser filechooser = new FileChooser(VocabularyViewActivity.this, "xls");
                                             filechooser.setFileListener(new FileChooser.FileSelectedListener() {
                                                 @Override
                                                 public void fileSelected(final File file) {
@@ -126,7 +126,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                                                     }
                                                 }
                                             });
-                                            filechooser.setExtension("xlsx");
+                                            //filechooser.setExtension("xlsx");
                                             filechooser.showDialog();
                                         }
                                     })
@@ -158,7 +158,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            FileChooser filechooser = new FileChooser(VocabularyViewActivity.this);
+                                            FileChooser filechooser = new FileChooser(VocabularyViewActivity.this, "xls");
                                             filechooser.setFileListener(new FileChooser.FileSelectedListener() {
                                                 @Override
                                                 public void fileSelected(final File file) {
@@ -169,7 +169,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                                                     }
                                                 }
                                             });
-                                            filechooser.setExtension("xls");
+                                            //filechooser.setExtension("xls");
                                             filechooser.showDialog();
                                         }
                                     })

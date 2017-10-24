@@ -441,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ((Button) dialog_layout.findViewById(R.id.my_b_upload)).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FileChooser filechooser = new FileChooser(MainActivity.this);
+                    FileChooser filechooser = new FileChooser(MainActivity.this, "xls");
                     filechooser.setFileListener(new FileChooser.FileSelectedListener() {
                         @Override
                         public void fileSelected(final File file) {
@@ -453,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         }
                     });
-                    filechooser.setExtension("xls");
+                    //filechooser.setExtension("xls");
                     filechooser.showDialog();
                 }
             });
