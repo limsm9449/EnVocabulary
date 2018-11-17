@@ -50,6 +50,14 @@ public class DicUtils {
         else
             return str.trim();
     }
+    public static String getString(HSSFCell cell) {
+        if (cell == null)
+            return "";
+        else
+            return cell.toString().trim();
+    }
+
+
 
     public static String getCurrentDate() {
         Calendar c = Calendar.getInstance();
@@ -1088,11 +1096,11 @@ public class DicUtils {
                     }
                 } else {
                     int idx = 0;
-                    String word = getString(myRow.getCell(idx++).toString());
-                    String mean = getString(myRow.getCell(idx++).toString());
-                    String spelling = getString(myRow.getCell(idx++).toString());
-                    String samples = getString(myRow.getCell(idx++).toString());
-                    String memo = getString(myRow.getCell(idx++).toString());
+                    String word = getString(myRow.getCell(idx++));
+                    String mean = getString(myRow.getCell(idx++));
+                    String spelling = getString(myRow.getCell(idx++));
+                    String samples = getString(myRow.getCell(idx++));
+                    String memo = getString(myRow.getCell(idx++));
 
                     if (!"단어".equals(word)) {
                         if (!"".equals(word) && !"".equals(mean)) {

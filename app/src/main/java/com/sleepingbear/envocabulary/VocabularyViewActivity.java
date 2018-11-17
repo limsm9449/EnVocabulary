@@ -111,7 +111,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                         } else if ( mSelect == 1 ) {
                             new AlertDialog.Builder(VocabularyViewActivity.this)
                                     .setTitle("알림")
-                                    .setMessage("엑셀 데이터 포맷이 맞습니까?\nCell : A(단어), B(뜻), C(스펠링), D(예제), E(메모)")
+                                    .setMessage("엑셀은 Excel 97-2003통합문서(.xls) 포맷이여야 합니다.\n엑셀 데이터 포맷이 맞습니까?\nCell : A(단어), B(뜻), C(스펠링), D(예제), E(메모)")
                                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
@@ -154,7 +154,7 @@ public class VocabularyViewActivity extends AppCompatActivity implements View.On
                         } else if ( mSelect == 4 ) {
                             new AlertDialog.Builder(VocabularyViewActivity.this)
                                     .setTitle("알림")
-                                    .setMessage("엑셀 데이터 포맷이 맞습니까?\nCell : A(단어)")
+                                    .setMessage("엑셀은 Excel 97-2003통합문서(.xls) 포맷이여야 합니다.\n엑셀 데이터 포맷이 맞습니까?\nCell : A(단어)")
                                     .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
